@@ -84,7 +84,6 @@ export default function AddTaskScreen({ navigation }) {
       <Paragraph>Enter the task details below:</Paragraph>
       <View style={styles.container}>
         <View style={styles.latest_card}>
-          <Text>Latest Saved Task: </Text>
           <Paragraph>Latest Saved Task:</Paragraph>
           {last_saved_task && (
             <View style={styles.taskContainer}>
@@ -133,11 +132,28 @@ export default function AddTaskScreen({ navigation }) {
           numberOfLines={4}
         />
 
+        {/* Display the selected date */}
+        {date && (
+          <Text style={styles.selectedDate}>
+            <Text style={styles.header}>Reminder on: </Text>{" "}
+            {new Date(date).toLocaleString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </Text>
+        )}
+
         {/* Toggle Button to Show/Hide DateTimePicker */}
-        <RNButton
-          title={showDatePicker ? "Hide Date Picker" : "Show Date Picker"}
-          onPress={toggleDatePicker}
-        />
+        <View style={styles.dateButton}>
+          <RNButton
+            title={showDatePicker ? "Hide Date Picker" : "Show Date Picker"}
+            onPress={toggleDatePicker}
+          />
+        </View>
 
         {/* Date Picker Component for Web */}
         {showDatePicker && (
@@ -145,7 +161,6 @@ export default function AddTaskScreen({ navigation }) {
             onChange={(newDate) => setDate(newDate)} // Update the date state
             value={date} // Bind the current date and time
             format="y-MM-dd h:mm a" // Display date and time in a readable format
-            style={styles.datePicker}
           />
         )}
 
@@ -201,11 +216,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  latest_card:{
-    border:"1px 1px solid black",
+  latest_card: {
+    border: "1px 1px solid black",
     backgroundColor: "rgb(229, 229, 235)",
     borderRadius: "10px",
     marginBottom: "20px",
-    boxShadow: "1px 1px 10px rgb(190, 190, 203)"
-  }
+    boxShadow: "1px 1px 10px rgb(190, 190, 203)",
+    padding: "10px"
+  },
+
+  dateButton: {},
 });
