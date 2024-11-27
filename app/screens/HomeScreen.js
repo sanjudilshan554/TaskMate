@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView, View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Background from "../../components/Background";
 import Logo from "../../components/Logo";
@@ -35,7 +42,19 @@ export default function HomeScreen() {
       }
     >
       <Text style={styles.taskTitle}>{item.title}</Text>
-      <Text>Status: {item.status}</Text>
+      <Text>Title: {item.status}</Text>
+      <Text>
+        Time:{" "}
+        {new Date(item.selected_date_time).toLocaleString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+        })}
+      </Text>
     </TouchableOpacity>
   );
 
@@ -55,7 +74,7 @@ export default function HomeScreen() {
         >
           Add Task
         </Button>
-
+ 
         {/* List of tasks */}
         <Text style={styles.sectionTitle}>Previous Tasks</Text>
         <View style={styles.listContainer}>
@@ -63,7 +82,7 @@ export default function HomeScreen() {
             data={tasks}
             renderItem={renderTaskItem}
             keyExtractor={(item) => item.id.toString()}
-            scrollEnabled={false} // Disable FlatList's internal scrolling
+            scrollEnabled={false}
           />
         </View>
 

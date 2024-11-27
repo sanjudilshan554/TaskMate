@@ -82,6 +82,9 @@ export default function AddTaskScreen({ navigation }) {
       <Logo />
       <Header>Add a New Task</Header>
       <Paragraph>Enter the task details below:</Paragraph>
+
+      <View style={styles.back} > <Button onPress={() => navigation.replace("HomeScreen")}> {"<-"} Back </Button></View>
+
       <View style={styles.container}>
         <View style={styles.latest_card}>
           <Paragraph>Latest Saved Task:</Paragraph>
@@ -179,7 +182,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   task: {
-    fontSize: 18,
+    fontSize: 15,
     marginVertical: 5,
     color: "#333",
   },
@@ -218,12 +221,18 @@ const styles = StyleSheet.create({
 
   latest_card: {
     border: "1px 1px solid black",
-    backgroundColor: "rgb(229, 229, 235)",
+    backgroundColor: "rgb(252, 255, 255)",
     borderRadius: "10px",
     marginBottom: "20px",
     boxShadow: "1px 1px 10px rgb(190, 190, 203)",
-    padding: "10px"
-  },
+    padding: "10px",
+    alignItem: "center",
+    justifyContent: "center",
+  }, 
 
-  dateButton: {},
+  back: {
+    marginTop: 10,
+    marginRight: 10, 
+    alignSelf: "flex-end",  
+  },
 });
