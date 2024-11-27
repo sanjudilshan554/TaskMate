@@ -14,6 +14,7 @@ import Logo from "../../components/Logo";
 import Header from "../../components/Header";
 import Paragraph from "../../components/Paragraph";
 import Button from "../../components/Button";
+import BackButton from "../../components/BackButton";
 
 export default function AddTaskScreen({ navigation }) {
   const [taskTitle, setTaskTitle] = useState("");
@@ -79,19 +80,17 @@ export default function AddTaskScreen({ navigation }) {
 
   return (
     <Background>
+      <BackButton onPress={() => navigation.replace("HomeScreen")} />
       <Logo />
       <Header>Add a New Task</Header>
       <Paragraph>Enter the task details below:</Paragraph>
-
-      <View style={styles.back} > <Button onPress={() => navigation.replace("HomeScreen")}> {"<-"} Back </Button></View>
-
       <View style={styles.container}>
         <View style={styles.latest_card}>
-          <Paragraph>Latest Saved Task:</Paragraph>
-          {last_saved_task && (
+          {last_saved_task ? (
             <View style={styles.taskContainer}>
+              <Paragraph>Latest Saved Task:</Paragraph>
               <Text style={styles.task}>
-                <Text style={styles.header}>Title: </Text>{" "}
+                <Text style={styles.header}>Title: </Text>
                 {last_saved_task.title}
               </Text>
               <Text style={styles.task}>
@@ -110,10 +109,12 @@ export default function AddTaskScreen({ navigation }) {
                 )}
               </Text>
               <Text style={styles.task}>
-                <Text style={styles.header}>Description: </Text>{" "}
+                <Text style={styles.header}>Description: </Text>
                 {last_saved_task.description}
               </Text>
             </View>
+          ) : (
+            <Text style={styles.message}>No Latest Task Available</Text>
           )}
         </View>
 
@@ -228,11 +229,17 @@ const styles = StyleSheet.create({
     padding: "10px",
     alignItem: "center",
     justifyContent: "center",
-  }, 
+  },
 
   back: {
     marginTop: 10,
-    marginRight: 10, 
-    alignSelf: "flex-end",  
+    marginRight: 10,
+    alignSelf: "flex-end",
+  },
+
+  message: {
+    textAlign: "center",
+    fontWeight: "bold",
+    color: "red",
   },
 });

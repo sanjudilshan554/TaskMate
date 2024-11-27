@@ -42,7 +42,6 @@ export default function HomeScreen() {
       }
     >
       <Text style={styles.taskTitle}>{item.title}</Text>
-      <Text>Title: {item.status}</Text>
       <Text>
         Time:{" "}
         {new Date(item.selected_date_time).toLocaleString("en-US", {

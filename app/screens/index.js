@@ -5,3 +5,5 @@ export { default as ResetPasswordScreen } from "./ResetPasswordScreen";
 export { default as HomeScreen } from "./HomeScreen";
 export { default as TaskDetailsScreen } from "./TaskDetailsScreen";
 export { default as AddTaskScreen } from "./AddTaskScreen";
+export { default as EditTaskScreen } from "./EditTaskScreen";
+

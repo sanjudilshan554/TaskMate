@@ -9,4 +9,10 @@ export const theme = {
     secondary: "#1F2732",
     error: "#ED1C24",
   },
+
+  back: {
+    marginTop: 10,
+    marginRight: 10,
+    alignSelf: "flex-end",
+  },
 };

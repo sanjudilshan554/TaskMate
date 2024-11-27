@@ -3,7 +3,7 @@ import { Provider } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";  // Import this component
 import { createStackNavigator } from "@react-navigation/stack";
 import { theme } from "./core/theme";
-import { StartScreen, LoginScreen, RegisterScreen, ResetPasswordScreen, HomeScreen, TaskDetailsScreen, AddTaskScreen } from "./screens"; 
+import { StartScreen, LoginScreen, RegisterScreen, ResetPasswordScreen, HomeScreen, EditTaskScreen, TaskDetailsScreen, AddTaskScreen } from "./screens"; 
 
 const Stack = createStackNavigator();
 
@@ -24,6 +24,7 @@ export default function App() {
           <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
           <Stack.Screen name="TaskDetailsScreen" component={TaskDetailsScreen} />
           <Stack.Screen name="AddTaskScreen" component={AddTaskScreen} />
+          <Stack.Screen name="EditTaskScreen" component={EditTaskScreen} />
         </Stack.Navigator>
       {/* </NavigationContainer> */}
     </Provider>
