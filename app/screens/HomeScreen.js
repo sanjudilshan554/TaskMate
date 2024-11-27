@@ -1,77 +1,108 @@
-import React from "react";
-import { View, Text, FlatList, TouchableOpacity } from "react-native";
-import { useNavigation } from "@react-navigation/native"; // Import useNavigation hook
+import React, { useState, useEffect } from "react";
+import { ScrollView, View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import Background from "../../components/Background";
 import Logo from "../../components/Logo";
 import Header from "../../components/Header";
 import Paragraph from "../../components/Paragraph";
 import Button from "../../components/Button";
+import axios from "axios";
 
 export default function HomeScreen() {
-  const navigation = useNavigation(); // Get navigation object using useNavigation hook
+  const [tasks, setTasks] = useState([]);
 
-  const tasks = [
-    { id: "1", title: "Finish React Native App", status: "In Progress" },
-    { id: "2", title: "Update Task Manager UI", status: "Completed" },
-    { id: "3", title: "Write documentation", status: "Pending" },
-  ];
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get("http://127.0.0.1:8000/api/tasks");
+      setTasks(response.data);
+      console.log("response", response);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
+  };
+
+  const navigation = useNavigation();
 
   const renderTaskItem = ({ item }) => (
     <TouchableOpacity
-      style={{
-        padding: 15,
-        marginVertical: 5,
-        backgroundColor: "#f2f2f2",
-        borderRadius: 10,
-      }}
+      style={styles.taskItem}
       onPress={() =>
         navigation.navigate("TaskDetailsScreen", { taskId: item.id })
       }
     >
-      <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.title}</Text>
+      <Text style={styles.taskTitle}>{item.title}</Text>
       <Text>Status: {item.status}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <Background>
-      <Logo />
-      <Header>Welcome to Task Mate</Header>
-      <Paragraph>
-        Manage your tasks efficiently. Here’s a list of your current tasks.
-      </Paragraph>
+    <ScrollView style={styles.scrollView}>
+      <Background>
+        <Logo />
+        <Header>Welcome to Task Mate</Header>
+        <Paragraph>
+          Manage your tasks efficiently. Here’s a list of your current tasks.
+        </Paragraph>
 
-      {/* Button to add a new task */}
-      <Button
-        title="Add New Task"
-        onPress={() => navigation.replace("AddTaskScreen")} // Navigate to the Add Task screen
-      />
-      <Button
-        mode="contained"
-        onPress={() => navigation.replace("AddTaskScreen")}
-      >
-        Add Task
-      </Button>
+        {/* Button to add a new task */}
+        <Button
+          mode="contained"
+          onPress={() => navigation.replace("AddTaskScreen")}
+        >
+          Add Task
+        </Button>
 
-      {/* List of tasks */}
-      <Text>previous Tasks</Text>
-      <FlatList
-        data={tasks}
-        renderItem={renderTaskItem}
-        keyExtractor={(item) => item.id}
-        style={{ marginTop: 20 }}
-      />
+        {/* List of tasks */}
+        <Text style={styles.sectionTitle}>Previous Tasks</Text>
+        <View style={styles.listContainer}>
+          <FlatList
+            data={tasks}
+            renderItem={renderTaskItem}
+            keyExtractor={(item) => item.id.toString()}
+            scrollEnabled={false} // Disable FlatList's internal scrolling
+          />
+        </View>
 
-      {/* Sign out button */}
-      <Button
-        title="Sign Out"
-        onPress={() => {
-          navigation.reset({
-            index: 0,
-            routes: [{ name: "LoginScreen" }], // Reset to the login screen
-          });
-        }}
-      />
-    </Background>
+        {/* Sign out button */}
+        <Button
+          title="Sign Out"
+          onPress={() => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: "LoginScreen" }],
+            });
+          }}
+        />
+      </Background>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  listContainer: {
+    marginTop: 20,
+  },
+  taskItem: {
+    padding: 15,
+    marginVertical: 5,
+    backgroundColor: "#f2f2f2",
+    borderRadius: 10,
+  },
+  taskTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginVertical: 10,
+  },
+});
