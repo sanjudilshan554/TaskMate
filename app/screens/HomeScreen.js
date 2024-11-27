@@ -1,20 +1,20 @@
 import React from 'react';
 import { View, Text, Button, FlatList, TouchableOpacity } from 'react-native';
-import Background from "../../components/Background";  // Assuming Background component adds some styling
-import Logo from "../../components/Logo";  // Assuming Logo component displays a logo
-import Header from "../../components/Header";  // Assuming Header displays a title
-import Paragraph from "../../components/Paragraph";  // Assuming Paragraph is a styled text component
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook
+import Background from "../../components/Background";
+import Logo from "../../components/Logo";
+import Header from "../../components/Header";
+import Paragraph from "../../components/Paragraph";
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen() {
+  const navigation = useNavigation(); // Get navigation object using useNavigation hook
 
-  // Sample data for tasks (Replace with actual data from your state or API)
   const tasks = [
     { id: '1', title: 'Finish React Native App', status: 'In Progress' },
     { id: '2', title: 'Update Task Manager UI', status: 'Completed' },
     { id: '3', title: 'Write documentation', status: 'Pending' },
   ];
 
-  // Render each task in the list
   const renderTaskItem = ({ item }) => (
     <TouchableOpacity
       style={{
@@ -39,7 +39,13 @@ export default function HomeScreen({ navigation }) {
       {/* Button to add a new task */}
       <Button
         title="Add New Task"
-        onPress={() => navigation.navigate('AddTaskScreen')} // Navigates to the Add Task screen
+        onPress={() => navigation.replace("AddTaskScreen")} // Navigate to the Add Task screen
+      />
+      
+      {/* Button to navigate to the Register Screen */}
+      <Button
+        title="Create an account"
+        onPress={() => navigation.navigate("RegisterScreen")} // Navigate to Register screen
       />
 
       {/* List of tasks */}
@@ -56,7 +62,7 @@ export default function HomeScreen({ navigation }) {
         onPress={() => {
           navigation.reset({
             index: 0,
-            routes: [{ name: "LoginScreen" }],  // Reset to the login screen
+            routes: [{ name: "LoginScreen" }], // Reset to the login screen
           });
         }}
       />

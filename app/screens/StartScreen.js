@@ -10,10 +10,9 @@ export default function StartScreen({ navigation }) {
   return (
     <Background>
       <Logo />
-      <Header>Welcome</Header>
+      <Header>Welcome To TaskMate</Header>
       <Paragraph>
-        A starter app template for React Native Expo, featuring a ready-to-use
-        login screen.
+      Enjoy TaskMate, your perfect partner in managing tasks and time!
       </Paragraph>
       <Button
         mode="contained"
