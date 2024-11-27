@@ -24,7 +24,7 @@ export default function HomeScreen() {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/tasks");
+      const response = await axios.get("http://127.0.0.1:8000/api/task/all");
       setTasks(response.data);
       console.log("response", response);
     } catch (error) {
@@ -41,8 +41,17 @@ export default function HomeScreen() {
         navigation.navigate("TaskDetailsScreen", { taskId: item.id })
       }
     >
-      <Text style={styles.taskTitle}>{item.title}</Text>
-      <Text>
+      <Text
+        style={[
+          styles.taskTitle,
+          item.status === 1 && styles.completedTask, // Apply strikethrough if completed
+        ]}
+      >
+        {item.title}
+      </Text>
+      <Text style={[ 
+          item.status === 1 && styles.completedSubTask, // Apply strikethrough if completed
+        ]}>
         Time:{" "}
         {new Date(item.selected_date_time).toLocaleString("en-US", {
           weekday: "long",
@@ -54,6 +63,7 @@ export default function HomeScreen() {
           second: "2-digit",
         })}
       </Text>
+      <Text>Status: {item.status === 1 ? "Completed" : "Pending"}</Text>
     </TouchableOpacity>
   );
 
@@ -73,28 +83,23 @@ export default function HomeScreen() {
         >
           Add Task
         </Button>
- 
-        {/* List of tasks */}
-        <Text style={styles.sectionTitle}>Previous Tasks</Text>
-        <View style={styles.listContainer}>
-          <FlatList
-            data={tasks}
-            renderItem={renderTaskItem}
-            keyExtractor={(item) => item.id.toString()}
-            scrollEnabled={false}
-          />
-        </View>
 
-        {/* Sign out button */}
-        <Button
-          title="Sign Out"
-          onPress={() => {
-            navigation.reset({
-              index: 0,
-              routes: [{ name: "LoginScreen" }],
-            });
-          }}
-        />
+        {/* List of tasks */}
+        <View style={styles.listContainer}>
+          {tasks.length === 0 ? (
+            <Text style={styles.sectionTitle}>No tasks available</Text>
+          ) : (
+            <>
+              <Text style={styles.sectionTitle}>Previous Tasks</Text>
+              <FlatList
+                data={tasks}
+                renderItem={renderTaskItem}
+                keyExtractor={(item) => item.id.toString()}
+                scrollEnabled={false}
+              />
+            </>
+          )}
+        </View>
       </Background>
     </ScrollView>
   );
@@ -117,6 +122,13 @@ const styles = StyleSheet.create({
   taskTitle: {
     fontSize: 18,
     fontWeight: "bold",
+  },
+  completedTask: {
+    textDecorationLine: "line-through", // Apply strikethrough for completed tasks
+    color: "gray", // Optional: you can change the text color for completed tasks
+  },
+  completedSubTask: {
+    textDecorationLine: "line-through", // Apply strikethrough for completed tasks 
   },
   sectionTitle: {
     fontSize: 20,

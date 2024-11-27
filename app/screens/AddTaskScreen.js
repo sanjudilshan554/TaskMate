@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TextInput,
   Button as RNButton,
+  TouchableOpacity,
 } from "react-native";
 import axios from "axios";
 import DateTimePicker from "react-datetime-picker";
@@ -19,11 +20,14 @@ import BackButton from "../../components/BackButton";
 export default function AddTaskScreen({ navigation }) {
   const [taskTitle, setTaskTitle] = useState("");
   const [text, setText] = useState("");
-  const [reminderTime, setReminderTime] = useState(""); // New state for reminder time
+  const [reminderTime, setReminderTime] = useState("");
   const [last_saved_task, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false); // New state to toggle date picker visibility
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  // State for task status
+  const [taskStatus, setTaskStatus] = useState(0); // Default status is "Pending"
 
   useEffect(() => {
     fetchTasks();
@@ -32,7 +36,7 @@ export default function AddTaskScreen({ navigation }) {
   const fetchTasks = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8000/api/last-saved-task"
+        "http://127.0.0.1:8000/api/task/last-saved-task"
       );
       setTasks(response.data);
     } catch (error) {
@@ -53,17 +57,19 @@ export default function AddTaskScreen({ navigation }) {
 
     setLoading(true);
     try {
-      const formattedDate = date.toISOString(); // Convert the date to ISO format for the backend
+      const formattedDate = date.toISOString();
 
-      const response = await axios.post("http://127.0.0.1:8000/api/tasks", {
+      const response = await axios.post("http://127.0.0.1:8000/api/task/store", {
         title: taskTitle,
         description: text,
-        reminder_time: formattedDate, // Use the combined date and time from the picker
+        reminder_time: formattedDate,
+        status: taskStatus, // Include task status in the request
       });
 
       setTaskTitle("");
       setText("");
-      setDate(new Date()); // Reset the date picker
+      setTaskStatus("Pending"); // Reset status to default
+      setDate(new Date());
       alert("Task added successfully");
       fetchTasks();
     } catch (error) {
@@ -73,7 +79,6 @@ export default function AddTaskScreen({ navigation }) {
     }
   };
 
-  // Toggle DateTimePicker visibility
   const toggleDatePicker = () => {
     setShowDatePicker((prev) => !prev);
   };
@@ -85,39 +90,6 @@ export default function AddTaskScreen({ navigation }) {
       <Header>Add a New Task</Header>
       <Paragraph>Enter the task details below:</Paragraph>
       <View style={styles.container}>
-        <View style={styles.latest_card}>
-          {last_saved_task ? (
-            <View style={styles.taskContainer}>
-              <Paragraph>Latest Saved Task:</Paragraph>
-              <Text style={styles.task}>
-                <Text style={styles.header}>Title: </Text>
-                {last_saved_task.title}
-              </Text>
-              <Text style={styles.task}>
-                <Text style={styles.header}>Time: </Text>
-                {new Date(last_saved_task.selected_date_time).toLocaleString(
-                  "en-US",
-                  {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    second: "2-digit",
-                  }
-                )}
-              </Text>
-              <Text style={styles.task}>
-                <Text style={styles.header}>Description: </Text>
-                {last_saved_task.description}
-              </Text>
-            </View>
-          ) : (
-            <Text style={styles.message}>No Latest Task Available</Text>
-          )}
-        </View>
-
         {/* Task Title Input */}
         <TextInput
           style={styles.input}
@@ -125,21 +97,49 @@ export default function AddTaskScreen({ navigation }) {
           value={taskTitle}
           onChangeText={setTaskTitle}
         />
-        {/* Task Description Text Area */}
+
+        {/* Task Description */}
         <TextInput
           style={styles.textArea}
           placeholder="Type your task description here..."
-          placeholderTextColor="#999"
           value={text}
           onChangeText={setText}
           multiline={true}
-          numberOfLines={4}
         />
 
-        {/* Display the selected date */}
+        {/* Task Status Radio Buttons */}
+        <View style={styles.radioContainer}>
+          <Text style={styles.header}>Status:</Text>
+          <TouchableOpacity
+            style={styles.radioButton}
+            onPress={() => setTaskStatus(0)}
+          >
+            <View
+              style={[
+                styles.radioCircle,
+                taskStatus === 0 && styles.selectedRadio,
+              ]}
+            />
+            <Text style={styles.radioLabel}>Pending</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.radioButton}
+            onPress={() => setTaskStatus(1)}
+          >
+            <View
+              style={[
+                styles.radioCircle,
+                taskStatus === 1 && styles.selectedRadio,
+              ]}
+            />
+            <Text style={styles.radioLabel}>Completed</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Selected Date Display */}
         {date && (
           <Text style={styles.selectedDate}>
-            <Text style={styles.header}>Reminder on: </Text>{" "}
+            <Text style={styles.header}>Reminder on: </Text>
             {new Date(date).toLocaleString("en-US", {
               weekday: "long",
               year: "numeric",
@@ -151,7 +151,7 @@ export default function AddTaskScreen({ navigation }) {
           </Text>
         )}
 
-        {/* Toggle Button to Show/Hide DateTimePicker */}
+        {/* DateTime Picker */}
         <View style={styles.dateButton}>
           <RNButton
             title={showDatePicker ? "Hide Date Picker" : "Show Date Picker"}
@@ -159,12 +159,10 @@ export default function AddTaskScreen({ navigation }) {
           />
         </View>
 
-        {/* Date Picker Component for Web */}
         {showDatePicker && (
           <DateTimePicker
-            onChange={(newDate) => setDate(newDate)} // Update the date state
-            value={date} // Bind the current date and time
-            format="y-MM-dd h:mm a" // Display date and time in a readable format
+            onChange={(newDate) => setDate(newDate)}
+            value={date}
           />
         )}
 
@@ -180,12 +178,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    backgroundColor: "#fff",
-  },
-  task: {
-    fontSize: 15,
-    marginVertical: 5,
-    color: "#333",
   },
   input: {
     borderWidth: 1,
@@ -193,53 +185,49 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
-    fontSize: 16,
   },
   textArea: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
     padding: 10,
-    fontSize: 16,
-    height: 100, // Height for the text area
-    textAlignVertical: "top", // Align text to the top
+    height: 100,
+    textAlignVertical: "top",
     marginBottom: 20,
   },
-  datePicker: {
-    width: "100%", // Ensure it spans full width
-    marginVertical: 10, // Add margin to separate from other elements
-    borderColor: "#ccc", // Optional: Style the border
-    borderWidth: 1,
-    borderRadius: 5, // Optional: round the corners
-  },
-  taskContainer: {
-    paddingBottom: "40px",
-  },
-
   header: {
     fontWeight: "bold",
+    marginBottom: 10,
   },
-
-  latest_card: {
-    border: "1px 1px solid black",
-    backgroundColor: "rgb(252, 255, 255)",
-    borderRadius: "10px",
-    marginBottom: "20px",
-    boxShadow: "1px 1px 10px rgb(190, 190, 203)",
-    padding: "10px",
-    alignItem: "center",
+  radioContainer: {
+    marginBottom: 20,
+  },
+  radioButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  radioCircle: {
+    height: 20,
+    width: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: "#333",
+    alignItems: "center",
     justifyContent: "center",
-  },
-
-  back: {
-    marginTop: 10,
     marginRight: 10,
-    alignSelf: "flex-end",
   },
-
-  message: {
-    textAlign: "center",
-    fontWeight: "bold",
-    color: "red",
+  selectedRadio: {
+    backgroundColor: "#333",
+  },
+  radioLabel: {
+    fontSize: 16,
+  },
+  selectedDate: {
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  dateButton: {
+    marginBottom: 20,
   },
 });
