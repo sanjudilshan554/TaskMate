@@ -7,12 +7,13 @@ import {
 
 import { theme } from "../app/core/theme";
 
-export default function Background({ children }) {
+export default function Background({ children, theme }) {
+  console.log("theme", theme);
   return (
     <ImageBackground
       source={require("../assets/items/dot.png")}
       resizeMode="repeat"
-      style={styles.background}
+      style={styles.theme}
     >
       <KeyboardAvoidingView style={styles.container} behavior="padding">
         {children}
@@ -21,11 +22,34 @@ export default function Background({ children }) {
   );
 }
 
+// theme.js
+export const lightTheme = {
+  background: "#fff",
+  text: "#000",
+  card: "#f2f2f2",
+  header: "#4CAF50",
+  logout: "#F44336",
+};
+
+export const darkTheme = {
+  background: "#000",
+  text: "#fff",
+  card: "#333",
+  header: "#81C784",
+  logout: "#E57373",
+};
+
 const styles = StyleSheet.create({
-  background: {
+  light_background: {
     flex: 1,
     width: "100%",
     backgroundColor: theme.colors.surface,
+  },
+  dark_background: {
+    flex: 1,
+    width: "100%",
+    text: "#fff",
+    backgroundColor: "#000",
   },
   container: {
     flex: 1,

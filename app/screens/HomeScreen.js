@@ -11,6 +11,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import Background from "../../components/Background";
 import Logo from "../../components/Logo";
+import LogoLight from "../../components/LogoLight";
 import Header from "../../components/Header";
 import Paragraph from "../../components/Paragraph";
 import Button from "../../components/Button";
@@ -28,6 +29,8 @@ export default function HomeScreen() {
 
   const theme = isDarkMode ? darkTheme : lightTheme; // Dynamically set the theme
 
+  console.log("dark mode", theme);
+
   useEffect(() => {
     fetchUserData();
   }, []);
@@ -37,6 +40,29 @@ export default function HomeScreen() {
       fetchTasks();
     }
   }, [user]);
+
+  // Function to save theme preference to the database
+  const saveTheme = async (newTheme) => {
+    try {
+      console.log("isDarkMode", newTheme);
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/user/theme/update/${user.id}`, // Ensure the endpoint is correct
+        {
+          theme: newTheme ? 1 : 0, // 1 for dark mode, 0 for light mode
+        }
+      );
+      console.log("Theme saved successfully:", response.data);
+    } catch (error) {
+      console.error("Error saving theme:", error);
+    }
+  };
+
+  // Handle theme toggle
+  const handleThemeToggle = () => {
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme); // Update state
+    saveTheme(newTheme); // Save the new theme to the database
+  };
 
   const fetchTasks = async () => {
     try {
@@ -109,7 +135,7 @@ export default function HomeScreen() {
     <ScrollView
       style={[styles.scrollView, { backgroundColor: theme.background }]}
     >
-      <Background>
+      <Background theme={theme}>
         <View style={styles.headerIcons}>
           {/* Profile Button */}
           <TouchableOpacity
@@ -125,19 +151,43 @@ export default function HomeScreen() {
           </TouchableOpacity>
 
           {/* Theme Toggle */}
-          <View style={styles.toggleContainer}>
-            <Text style={{ color: theme.text }}>Dark Mode</Text>
-            <Switch
-              value={isDarkMode}
-              onValueChange={() => setIsDarkMode(!isDarkMode)}
-            />
+          <View style={styles.container}>
+            {/* Theme Toggle */}
+            <View style={styles.toggleContainer}>
+              <Text style={{ color: theme.text }}>Dark Mode</Text>
+              <Switch
+                value={isDarkMode}
+                onValueChange={handleThemeToggle} // Toggle and save theme
+              />
+            </View>
           </View>
         </View>
 
-        <Logo />
-        <SubHeader>Hi {user.name}</SubHeader>
-        <Header>Welcome to Task Mate</Header>
-        <Paragraph>
+        {isDarkMode ? <LogoLight /> : <Logo />}
+
+        <SubHeader style={{ color: theme.text, fontWeight: "bold" }}>
+          Hi {user.name}
+        </SubHeader>
+        <Header
+          style={{
+            // color: theme.text,
+            fontSize: 21,
+            color: theme.primary,
+            fontWeight: "bold",
+            paddingVertical: 12,
+          }}
+        >
+          Welcome to Task Mate
+        </Header>
+        <Paragraph
+          style={{
+            color: theme.text,
+            fontSize: 15,
+            lineHeight: 21,
+            textAlign: "center",
+            marginBottom: 12,
+          }}
+        >
           Manage your tasks efficiently. Here’s a list of your current tasks.
         </Paragraph>
 

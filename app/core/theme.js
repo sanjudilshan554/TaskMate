@@ -25,13 +25,16 @@ export const lightTheme = {
   card: "#f2f2f2",
   header: "#4CAF50",
   logout: "#F44336",
+  primary: "#4C4C9D"
 };
 
 export const darkTheme = {
-  background: "#000",
+  background: "rgb(51, 50, 49)",
   text: "#fff",
-  card: "#333",
+  card: "rgb(84, 82, 80)",
   header: "#81C784",
   logout: "#E57373",
+  SubHeader: "#000",
+  primary: "#fff",
 };
 
