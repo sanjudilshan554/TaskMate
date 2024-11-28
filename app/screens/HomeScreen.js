@@ -38,6 +38,7 @@ export default function HomeScreen() {
   useEffect(() => {
     if (user.id) {
       fetchTasks();
+      setTheme();
     }
   }, [user]);
 
@@ -51,9 +52,21 @@ export default function HomeScreen() {
           theme: newTheme ? 1 : 0, // 1 for dark mode, 0 for light mode
         }
       );
+      await AsyncStorage.setItem("userData", JSON.stringify(response.data.data));
       console.log("Theme saved successfully:", response.data);
     } catch (error) {
       console.error("Error saving theme:", error);
+    }
+  };
+
+  const setTheme = () => {
+    console.log('user',user.theme)
+    if (user.theme == 1) {
+      setIsDarkMode(true);
+      console.log('true');
+    } else {
+      setIsDarkMode(false);
+      console.log('false');
     }
   };
 

@@ -29,7 +29,7 @@ export const lightTheme = {
 };
 
 export const darkTheme = {
-  background: "rgb(51, 50, 49)",
+  background: "rgb(53, 50, 49)",
   text: "#fff",
   card: "rgb(84, 82, 80)",
   header: "#81C784",

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
+  ScrollView,
   View,
   Text,
   FlatList,
@@ -17,6 +18,8 @@ import Paragraph from "../../components/Paragraph";
 import Button from "../../components/Button";
 import BackButton from "../../components/BackButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { lightTheme, darkTheme } from "../core/theme";
+import LogoLight from "../../components/LogoLight";
 
 export default function AddTaskScreen({ navigation }) {
   const [taskTitle, setTaskTitle] = useState("");
@@ -26,14 +29,23 @@ export default function AddTaskScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const theme = isDarkMode ? darkTheme : lightTheme; // Dynamically set the theme
 
   // State for task status
   const [taskStatus, setTaskStatus] = useState(0); // Default status is "Pending"
   const [user, setUser] = useState({});
 
-  useEffect(() => { 
+  useEffect(() => {
     fetchUserData();
+    setTheme();
   }, []);
+
+  useEffect(() => {
+    if (user.id) {
+      setTheme();
+    }
+  }, [user]);
 
   const fetchUserData = async () => {
     const userData = await AsyncStorage.getItem("userData");
@@ -42,7 +54,16 @@ export default function AddTaskScreen({ navigation }) {
       setUser(userDetails);
     }
   };
- 
+
+  const setTheme = () => {
+    console.log("user", user);
+    if (user.theme == 1) {
+      setIsDarkMode(true);
+    } else {
+      setIsDarkMode(false);
+      console.log("theme", false);
+    }
+  };
 
   const addTask = async () => {
     if (!taskTitle.trim()) {
@@ -73,7 +94,7 @@ export default function AddTaskScreen({ navigation }) {
       setText("");
       setTaskStatus("Pending"); // Reset status to default
       setDate(new Date());
-      alert("Task added successfully"); 
+      alert("Task added successfully");
     } catch (error) {
       console.error("Error adding task:", error);
     } finally {
@@ -86,93 +107,147 @@ export default function AddTaskScreen({ navigation }) {
   };
 
   return (
-    <Background>
-      <BackButton onPress={() => navigation.replace("HomeScreen")} />
-      <Logo />
-      <Header>Add a New Task</Header>
-      <Paragraph>Enter the task details below:</Paragraph>
-      <View style={styles.container}>
-        {/* Task Title Input */}
-        <TextInput
-          style={styles.input}
-          placeholder="Enter task title"
-          value={taskTitle}
-          onChangeText={setTaskTitle}
-        />
-
-        {/* Task Description */}
-        <TextInput
-          style={styles.textArea}
-          placeholder="Type your task description here..."
-          value={text}
-          onChangeText={setText}
-          multiline={true}
-        />
-
-        {/* Task Status Radio Buttons */}
-        <View style={styles.radioContainer}>
-          <Text style={styles.header}>Status:</Text>
-          <TouchableOpacity
-            style={styles.radioButton}
-            onPress={() => setTaskStatus(0)}
-          >
-            <View
-              style={[
-                styles.radioCircle,
-                taskStatus === 0 && styles.selectedRadio,
-              ]}
-            />
-            <Text style={styles.radioLabel}>Pending</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.radioButton}
-            onPress={() => setTaskStatus(1)}
-          >
-            <View
-              style={[
-                styles.radioCircle,
-                taskStatus === 1 && styles.selectedRadio,
-              ]}
-            />
-            <Text style={styles.radioLabel}>Completed</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Selected Date Display */}
-        {date && (
-          <Text style={styles.selectedDate}>
-            <Text style={styles.header}>Reminder on: </Text>
-            {new Date(date).toLocaleString("en-US", {
-              weekday: "long",
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            })}
-          </Text>
-        )}
-
-        {/* DateTime Picker */}
-        <View style={styles.dateButton}>
-          <RNButton
-            title={showDatePicker ? "Hide Date Picker" : "Show Date Picker"}
-            onPress={toggleDatePicker}
+    <ScrollView
+      style={[styles.scrollView, { backgroundColor: theme.background }]}
+    >
+      <Background style={{ backgroundColor: theme.background }}>
+        <BackButton onPress={() => navigation.replace("HomeScreen")} />
+        {isDarkMode ? <LogoLight /> : <Logo />}
+        <Header
+          style={{
+            // color: theme.text,
+            fontSize: 21,
+            color: theme.primary,
+            fontWeight: "bold",
+            paddingVertical: 12,
+          }}
+        >
+          Add a New Task
+        </Header>
+        <Paragraph
+          style={{
+            color: theme.text,
+            fontSize: 15,
+            lineHeight: 21,
+            textAlign: "center",
+            marginBottom: 12,
+          }}
+        >
+          Enter the task details below:
+        </Paragraph>
+        <View style={styles.container}>
+          {/* Task Title Input */}
+          <TextInput
+            style={[styles.input, { color: theme.text }]}
+            placeholder="Enter task title"
+            value={taskTitle}
+            onChangeText={setTaskTitle}
           />
-        </View>
 
-        {showDatePicker && (
-          <DateTimePicker
-            onChange={(newDate) => setDate(newDate)}
-            value={date}
+          {/* Task Description */}
+          <TextInput
+            style={[styles.textArea, { color: theme.text }]}
+            placeholder="Type your task description here..."
+            value={text}
+            onChangeText={setText}
+            multiline={true}
           />
-        )}
 
-        <Button mode="contained" onPress={addTask} loading={loading}>
-          {loading ? "Adding..." : "Add Task"}
-        </Button>
-      </View>
-    </Background>
+          {/* Task Status Radio Buttons */}
+          <View style={styles.radioContainer}>
+            <Text
+              style={{
+                color: theme.text,
+              }}
+            >
+              Status:
+            </Text>
+            <TouchableOpacity
+              style={styles.radioButton}
+              onPress={() => setTaskStatus(0)}
+            >
+              <View
+                style={[
+                  styles.radioCircle,
+                  taskStatus === 0 && styles.selectedRadio,
+                ]}
+              />
+              <Text
+                style={{
+                  color: theme.text,
+                  fontSize: 16,
+                }}
+              >
+                Pending
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.radioButton}
+              onPress={() => setTaskStatus(1)}
+            >
+              <View
+                style={[
+                  styles.radioCircle,
+                  taskStatus === 1 && styles.selectedRadio,
+                ]}
+              />
+              <Text
+                style={{
+                  color: theme.text,
+                  fontSize: 16,
+                }}
+              >
+                Completed
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Selected Date Display */}
+          {date && (
+            <Text
+              style={{
+                color: theme.text,
+              }}
+            >
+              <Text
+                style={{
+                  color: theme.text,
+                }}
+              >
+                Reminder on:{" "}
+              </Text>
+              {new Date(date).toLocaleString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+            </Text>
+          )}
+
+          {/* DateTime Picker */}
+          <View style={styles.dateButton}>
+            <RNButton
+              title={showDatePicker ? "Hide Date Picker" : "Show Date Picker"}
+              onPress={toggleDatePicker}
+            />
+          </View>
+
+          {showDatePicker && (
+            <DateTimePicker
+              onChange={(newDate) => setDate(newDate)}
+              value={date}
+            />
+          )}
+
+          <Button mode="contained" onPress={addTask} loading={loading}>
+            {loading ? "Adding..." : "Add Task"}
+          </Button>
+        </View>
+      </Background>
+    </ScrollView>
   );
 }
 
@@ -208,6 +283,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: 10,
+    color: "white",
   },
   radioCircle: {
     height: 20,
@@ -222,9 +298,7 @@ const styles = StyleSheet.create({
   selectedRadio: {
     backgroundColor: "#333",
   },
-  radioLabel: {
-    fontSize: 16,
-  },
+
   selectedDate: {
     fontSize: 16,
     marginBottom: 20,

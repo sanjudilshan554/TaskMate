@@ -6,9 +6,18 @@ import Paragraph from "../../components/Paragraph";
 import Button from "../../components/Button";
 import DeleteButton from "../../components/DeleteButton";
 import axios from "axios";
-import TextInput from "../../components/TextInput";
-import { Alert, View, TouchableOpacity, Text } from "react-native";
+import {
+  Alert,
+  View,
+  TouchableOpacity,
+  Text,
+  ScrollView,
+  TextInput,
+} from "react-native";
 import BackButton from "../../components/BackButton";
+import { lightTheme, darkTheme } from "../core/theme";
+import LogoLight from "../../components/LogoLight";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function TaskDetailsScreen({ route, navigation }) {
   const { taskId } = route.params; // Get taskId from route parameters
@@ -18,12 +27,41 @@ export default function TaskDetailsScreen({ route, navigation }) {
   const [taskDescription, setTaskDescription] = useState("");
   const [taskDate, setTaskDate] = useState("");
   const [taskStatus, setTaskStatus] = useState(0); // Add state to track task status
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const theme = isDarkMode ? darkTheme : lightTheme; // Dynamically set the theme
+  const [user, setUser] = useState({});
 
   useEffect(() => {
     if (taskId) {
       fetchTask(taskId);
+      fetchUserData();
+      setTheme();
     }
   }, [taskId]);
+
+  useEffect(() => {
+    if (user.id) {
+      setTheme();
+    }
+  });
+
+  const fetchUserData = async () => {
+    const userData = await AsyncStorage.getItem("userData");
+    if (userData) {
+      const userDetails = JSON.parse(userData);
+      setUser(userDetails);
+    }
+  };
+
+  const setTheme = () => {
+    console.log("user", user);
+    if (user.theme == 1) {
+      setIsDarkMode(true);
+    } else {
+      setIsDarkMode(false);
+      console.log("theme", false);
+    }
+  };
 
   const fetchTask = async (id) => {
     try {
@@ -77,93 +115,117 @@ export default function TaskDetailsScreen({ route, navigation }) {
   };
 
   return (
-    <Background>
-      <BackButton onPress={() => navigation.replace("HomeScreen")} />
+    <ScrollView
+      style={[styles.scrollView, { backgroundColor: theme.background }]}
+    >
+      <Background style={{ backgroundColor: theme.background }}>
+        <BackButton onPress={() => navigation.replace("HomeScreen")} />
 
-      <Logo />
-      <Header>Task Details</Header>
-      {loading ? (
-        <Paragraph>Loading...</Paragraph>
-      ) : task ? (
-        <>
-          <TextInput
-            placeholder="Enter task title"
-            value={taskTitle}
-            onChangeText={setTaskTitle}
-          />
-          <TextInput
-            placeholder="Enter task description"
-            value={taskDescription}
-            onChangeText={setTaskDescription}
-          />
-          <TextInput
-            placeholder="Enter task date"
-            value={taskDate}
-            onChangeText={setTaskDate}
-          />
+        {isDarkMode ? <LogoLight /> : <Logo />}
+        <Header
+          style={{
+            // color: theme.text,
+            fontSize: 21,
+            color: theme.primary,
+            fontWeight: "bold",
+            paddingBottom: 20,
+          }}
+        >
+          Edit Task
+        </Header>
+        {loading ? (
+          <Paragraph>Loading...</Paragraph>
+        ) : task ? (
+          <>
+            <TextInput
+              style={[styles.input, { color: theme.text }]}
+              placeholder="Enter task title"
+              value={taskTitle}
+              onChangeText={setTaskTitle}
+            />
+            <TextInput
+              style={[styles.input, { color: theme.text }]}
+              placeholder="Enter task description"
+              value={taskDescription}
+              onChangeText={setTaskDescription}
+            />
+            <TextInput
+              style={[styles.input, { color: theme.text }]}
+              placeholder="Enter task date"
+              value={taskDate}
+              onChangeText={setTaskDate}
+            />
 
-          {/* Task Status Radio Buttons */}
-          <View style={styles.radioContainer}>
-            <Text style={styles.header}>Status: </Text>
-            <TouchableOpacity
-              style={styles.radioButton}
-              onPress={() => setTaskStatus(0)}
-            >
-              <View
-                style={[
-                  styles.radioCircle,
-                  taskStatus === 0 && styles.selectedRadio,
-                ]}
-              />
-              <Text style={styles.radioLabel}>Pending</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.radioButton}
-              onPress={() => setTaskStatus(1)}
-            >
-              <View
-                style={[
-                  styles.radioCircle,
-                  taskStatus === 1 && styles.selectedRadio,
-                ]}
-              />
-              <Text style={styles.radioLabel}>Completed</Text>
-            </TouchableOpacity>
-          </View>
+            {/* Task Status Radio Buttons */}
+            {/* Task Status Radio Buttons */}
+            <View style={[styles.radioContainer, { paddingBottom: "20px" }]}>
+              <Text style={[{ color: theme.text }]}>Status: </Text>
+              <TouchableOpacity
+                style={styles.radioButton}
+                onPress={() => setTaskStatus(0)}
+              >
+                <View
+                  style={[
+                    styles.radioCircle,
+                    taskStatus === 0 && {
+                      ...styles.selectedRadio,
+                      backgroundColor: theme.text,
+                    },
+                  ]}
+                />
+                <Text style={[{ color: theme.text }]}>Pending</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.radioButton}
+                onPress={() => setTaskStatus(1)}
+              >
+                <View
+                  style={[
+                    styles.radioCircle,
+                    taskStatus === 1 && {
+                      ...styles.selectedRadio,
+                      backgroundColor: theme.text,
+                    },
+                  ]}
+                />
+                <Text style={[{ color: theme.text }]}>Completed</Text>
+              </TouchableOpacity>
+            </View>
 
-          <Button mode="contained" onPress={updateTask} loading={loading}>
-            {loading ? "Updating..." : "Save Changes"}
-          </Button>
+            <Button mode="contained" onPress={updateTask} loading={loading}>
+              {loading ? "Updating..." : "Save Changes"}
+            </Button>
 
-          <DeleteButton
-            mode="outlined"
-            onPress={async () => {
-              const userConfirmed = window.confirm(
-                "Are you sure you want to delete this task?"
-              );
-              if (userConfirmed) {
-                try {
-                  await axios.delete(
-                    `http://127.0.0.1:8000/api/task/delete/${taskId}`
-                  );
-                  alert("Task deleted successfully!");
-                  navigation.replace("HomeScreen"); // Navigate back to the previous screen
-                } catch (error) {
-                  console.error("Error deleting task:", error);
-                  alert("Failed to delete the task. Please try again.");
+            <DeleteButton
+              mode="outlined"
+              onPress={async () => {
+                const userConfirmed = window.confirm(
+                  "Are you sure you want to delete this task?"
+                );
+                if (userConfirmed) {
+                  try {
+                    await axios.delete(
+                      `http://127.0.0.1:8000/api/task/delete/${taskId}`
+                    );
+                    alert("Task deleted successfully!");
+                    navigation.replace("HomeScreen"); // Navigate back to the previous screen
+                  } catch (error) {
+                    console.error("Error deleting task:", error);
+                    alert("Failed to delete the task. Please try again.");
+                  }
+                } else {
+                  alert("Task deletion canceled.");
                 }
-              } else {
-                alert("Task deletion canceled.");
-              }
-            }}
-          >
-            Delete Task
-          </DeleteButton>
-        </>
-      ) : (
-        <Paragraph>Task not found or unable to fetch task details.</Paragraph>
-      )}
-    </Background>
+              }}
+            >
+              Delete Task
+            </DeleteButton>
+          </>
+        ) : (
+          <Paragraph>Task not found or unable to fetch task details.</Paragraph>
+        )}
+      </Background>
+    </ScrollView>
   );
 }
 
@@ -171,23 +233,22 @@ const styles = {
   radioContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 20,
   },
   radioButton: {
     flexDirection: "row",
     alignItems: "center",
-    marginRight: 20,
+    marginHorizontal: 10,
   },
   radioCircle: {
-    width: 20,
     height: 20,
+    width: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: "#000",
-    marginRight: 10,
+    borderColor: "#ccc",
+    marginRight: 8,
   },
   selectedRadio: {
-    backgroundColor: "#000",
+    backgroundColor: "blue", // This will be overridden by `theme.text` dynamically.
   },
   radioLabel: {
     fontSize: 16,
@@ -196,5 +257,13 @@ const styles = {
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    width: "100%",
   },
 };
