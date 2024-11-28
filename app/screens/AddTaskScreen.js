@@ -176,7 +176,7 @@ export default function AddTaskScreen({ navigation }) {
               <View
                 style={[
                   styles.radioCircle,
-                  taskStatus === 0 && styles.selectedRadio,
+                  taskStatus === 0 && { backgroundColor: theme.text }, // Use theme.text
                 ]}
               />
               <Text
@@ -195,7 +195,7 @@ export default function AddTaskScreen({ navigation }) {
               <View
                 style={[
                   styles.radioCircle,
-                  taskStatus === 1 && styles.selectedRadio,
+                  taskStatus === 1 && { backgroundColor: theme.text }, // Use theme.text
                 ]}
               />
               <Text
@@ -284,26 +284,22 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   radioContainer: {
-    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingBottom: "15px",
   },
   radioButton: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 10,
-    color: "white",
+    marginHorizontal: 10,
   },
   radioCircle: {
     height: 20,
     width: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: "#333",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 10,
-  },
-  selectedRadio: {
-    backgroundColor: "#333",
+    borderColor: "#ccc",
+    marginRight: 8,
   },
 
   selectedDate: {
