@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Text } from "react-native-paper";
 
 import Background from "../../components/Background";
@@ -13,11 +13,13 @@ import { emailValidator } from "../helpers/emailValidator";
 import { passwordValidator } from "../helpers/passwordValidator";
 import { nameValidator } from "../helpers/nameValidator";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState({ value: "", error: "" });
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
+  const [loading, setLoading] = useState(false);
 
   const onSignUpPressed = async () => {
     const nameError = nameValidator(name.value);
@@ -31,14 +33,37 @@ export default function RegisterScreen({ navigation }) {
       return;
     }
 
-    const response = await axios.post("http://127.0.0.1:8000/api/user/store", {
-      name: name.value,
-      email: email.value,
-      password: password.value,
-    });
+    setLoading(true); // Show loading indicator
+    try {
+      const response = await axios.post(
+        "http://127.0.0.1:8000/api/user/store",
+        {
+          name: name.value,
+          email: email.value,
+          password: password.value,
+        }
+      );
 
-    alert("Account registered successfully");
-    navigation.replace("HomeScreen");
+      await AsyncStorage.setItem(
+        "userData",
+        JSON.stringify(response.data.data)
+      );
+      alert("Account registered successfully");
+      navigation.replace("HomeScreen");
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const emailError = error.response.data.errors.email;
+        if (emailError) {
+          alert(emailError);
+        } else {
+          alert("An error occurred. Please try again.");
+        }
+      } else {
+        alert("Network error. Please check your connection.");
+      }
+    } finally {
+      setLoading(false); // Hide loading indicator
+    }
   };
 
   return (
@@ -79,11 +104,12 @@ export default function RegisterScreen({ navigation }) {
         mode="contained"
         onPress={onSignUpPressed}
         style={{ marginTop: 24 }}
+        loading={loading}
       >
-        Next
+        {loading ? "Registering..." : "Register"}
       </Button>
       <View style={styles.row}>
-        <Text>I already have an account !</Text>
+        <Text>I already have an account!</Text>
       </View>
       <View style={styles.row}>
         <TouchableOpacity onPress={() => navigation.replace("LoginScreen")}>
