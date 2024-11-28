@@ -16,10 +16,12 @@ import Button from "../../components/Button";
 import SubHeader from "../../components/SubHeader";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "react-native-vector-icons/MaterialIcons"; // For icons
 
 export default function HomeScreen() {
   const [tasks, setTasks] = useState([]);
   const [user, setUser] = useState({});
+  const navigation = useNavigation();
 
   useEffect(() => {
     fetchTasks();
@@ -30,7 +32,6 @@ export default function HomeScreen() {
     try {
       const response = await axios.get("http://127.0.0.1:8000/api/task/all");
       setTasks(response.data);
-      console.log("response", response);
     } catch (error) {
       console.error("Error fetching tasks:", error);
     }
@@ -41,12 +42,13 @@ export default function HomeScreen() {
     if (userData) {
       const userDetails = JSON.parse(userData);
       setUser(userDetails);
-      console.log('de', user);
     }
   };
-  
 
-  const navigation = useNavigation();
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("userData");
+    navigation.replace("LoginScreen");
+  };
 
   const renderTaskItem = ({ item }) => (
     <TouchableOpacity
@@ -63,9 +65,11 @@ export default function HomeScreen() {
       >
         {item.title}
       </Text>
-      <Text style={[ 
+      <Text
+        style={[
           item.status === 1 && styles.completedSubTask, // Apply strikethrough if completed
-        ]}>
+        ]}
+      >
         Time:{" "}
         {new Date(item.selected_date_time).toLocaleString("en-US", {
           weekday: "long",
@@ -84,6 +88,21 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.scrollView}>
       <Background>
+        <View style={styles.headerIcons}>
+          {/* Profile Button */}
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={() => navigation.navigate("UserProfileScreen")}
+          >
+            <Icon name="account-circle" size={30} color="#4CAF50" />
+          </TouchableOpacity>
+
+          {/* Logout Button */}
+          <TouchableOpacity style={styles.iconButton} onPress={handleLogout}>
+            <Icon name="logout" size={30} color="#F44336" />
+          </TouchableOpacity>
+        </View>
+
         <Logo />
         <SubHeader>Hi {user.name}</SubHeader>
         <Header>Welcome to Task Mate</Header>
@@ -143,11 +162,20 @@ const styles = StyleSheet.create({
     color: "gray", // Optional: you can change the text color for completed tasks
   },
   completedSubTask: {
-    textDecorationLine: "line-through", // Apply strikethrough for completed tasks 
+    textDecorationLine: "line-through", // Apply strikethrough for completed tasks
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: "bold",
     marginVertical: 10,
+  },
+  headerIcons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 10,
+    paddingHorizontal: 20,
+  },
+  iconButton: {
+    padding: 5,
   },
 });
