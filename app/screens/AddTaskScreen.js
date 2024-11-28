@@ -16,6 +16,7 @@ import Header from "../../components/Header";
 import Paragraph from "../../components/Paragraph";
 import Button from "../../components/Button";
 import BackButton from "../../components/BackButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function AddTaskScreen({ navigation }) {
   const [taskTitle, setTaskTitle] = useState("");
@@ -28,21 +29,20 @@ export default function AddTaskScreen({ navigation }) {
 
   // State for task status
   const [taskStatus, setTaskStatus] = useState(0); // Default status is "Pending"
+  const [user, setUser] = useState({});
 
-  useEffect(() => {
-    fetchTasks();
+  useEffect(() => { 
+    fetchUserData();
   }, []);
 
-  const fetchTasks = async () => {
-    try {
-      const response = await axios.get(
-        "http://127.0.0.1:8000/api/task/last-saved-task"
-      );
-      setTasks(response.data);
-    } catch (error) {
-      console.error("Error fetching last_saved_task:", error);
+  const fetchUserData = async () => {
+    const userData = await AsyncStorage.getItem("userData");
+    if (userData) {
+      const userDetails = JSON.parse(userData);
+      setUser(userDetails);
     }
   };
+ 
 
   const addTask = async () => {
     if (!taskTitle.trim()) {
@@ -59,19 +59,21 @@ export default function AddTaskScreen({ navigation }) {
     try {
       const formattedDate = date.toISOString();
 
-      const response = await axios.post("http://127.0.0.1:8000/api/task/store", {
-        title: taskTitle,
-        description: text,
-        reminder_time: formattedDate,
-        status: taskStatus, // Include task status in the request
-      });
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/task/store/${user.id}`,
+        {
+          title: taskTitle,
+          description: text,
+          reminder_time: formattedDate,
+          status: taskStatus, // Include task status in the request
+        }
+      );
 
       setTaskTitle("");
       setText("");
       setTaskStatus("Pending"); // Reset status to default
       setDate(new Date());
-      alert("Task added successfully");
-      fetchTasks();
+      alert("Task added successfully"); 
     } catch (error) {
       console.error("Error adding task:", error);
     } finally {

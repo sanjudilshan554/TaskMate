@@ -24,13 +24,21 @@ export default function HomeScreen() {
   const navigation = useNavigation();
 
   useEffect(() => {
-    fetchTasks();
-    fetchUserData();
+    fetchUserData(); 
   }, []);
+
+  useEffect(() => {
+    if (user.id) {
+      fetchTasks();
+    }
+  }, [user]);
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:8000/api/task/all");
+      console.log("id", user.id);
+      const response = await axios.get(
+        `http://127.0.0.1:8000/api/task/all/${user.id}`
+      );
       setTasks(response.data);
     } catch (error) {
       console.error("Error fetching tasks:", error);
@@ -38,10 +46,14 @@ export default function HomeScreen() {
   };
 
   const fetchUserData = async () => {
-    const userData = await AsyncStorage.getItem("userData");
-    if (userData) {
-      const userDetails = JSON.parse(userData);
-      setUser(userDetails);
+    try {
+      const userData = await AsyncStorage.getItem("userData");
+      if (userData) {
+        const userDetails = JSON.parse(userData);
+        setUser(userDetails); // This will trigger the second useEffect
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
     }
   };
 
