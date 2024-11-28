@@ -46,7 +46,10 @@ export default function UserProfileScreen({ navigation }) {
         }
       );
       Alert.alert("Success", "Profile updated successfully.");
-      await AsyncStorage.setItem("userData", JSON.stringify(response.data.data)); // Update local storage
+      await AsyncStorage.setItem(
+        "userData",
+        JSON.stringify(response.data.data)
+      ); // Update local storage
       fetchUserData(); // Refresh local data
     } catch (error) {
       console.error("Error updating user:", error);
@@ -57,28 +60,15 @@ export default function UserProfileScreen({ navigation }) {
   };
 
   const deleteUserAccount = async () => {
-    Alert.alert(
-      "Confirm Deletion",
-      "Are you sure you want to delete your account? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await axios.delete(`http://127.0.0.1:8000/api/user/delete/${user.id}`);
-              Alert.alert("Account Deleted", "Your account has been deleted.");
-              await AsyncStorage.clear(); // Clear stored data
-              navigation.replace("LoginScreen");
-            } catch (error) {
-              console.error("Error deleting user:", error);
-              Alert.alert("Error", "Failed to delete account.");
-            }
-          },
-        },
-      ]
-    );
+    try {
+      await axios.delete(`http://127.0.0.1:8000/api/user/delete/${user.id}`);
+      alert("Your account has been deleted.");
+      await AsyncStorage.clear(); // Clear stored data
+      navigation.replace("LoginScreen");
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      alert("Failed to delete account.");
+    }
   };
 
   return (
@@ -103,12 +93,32 @@ export default function UserProfileScreen({ navigation }) {
             keyboardType="email-address"
           />
 
-          <Button mode="contained" onPress={updateUserProfile} loading={loading}>
+          <Button
+            mode="contained"
+            onPress={updateUserProfile}
+            loading={loading}
+          >
             {loading ? "Updating..." : "Save Changes"}
           </Button>
 
-          <DeleteButton mode="outlined" onPress={deleteUserAccount} style={styles.deleteButton}>
+          {/* <DeleteButton mode="outlined" onPress={deleteUserAccount} style={styles.deleteButton}>
             Delete Account
+          </DeleteButton> */}
+
+          <DeleteButton
+            mode="outlined"
+            onPress={async () => {
+              const userConfirmed = window.confirm(
+                "Are you sure you want to delete your account?"
+              );
+              if (userConfirmed) {
+                deleteUserAccount();
+              } else {
+                alert("Task deletion canceled.");
+              }
+            }}
+          >
+            Delete Task
           </DeleteButton>
         </>
       ) : (
@@ -118,6 +128,4 @@ export default function UserProfileScreen({ navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
-
-});
+const styles = StyleSheet.create({});
