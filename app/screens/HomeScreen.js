@@ -42,24 +42,27 @@ export default function HomeScreen() {
 
   // Function to save theme preference to the database
   const saveTheme = async (newTheme) => {
-    try { 
+    try {
       const response = await axios.post(
         `http://127.0.0.1:8000/api/user/theme/update/${user.id}`, // Ensure the endpoint is correct
         {
           theme: newTheme ? 1 : 0, // 1 for dark mode, 0 for light mode
         }
       );
-      await AsyncStorage.setItem("userData", JSON.stringify(response.data.data)); 
+      await AsyncStorage.setItem(
+        "userData",
+        JSON.stringify(response.data.data)
+      );
     } catch (error) {
       alert("Error saving theme");
     }
   };
 
-  const setTheme = () => { 
+  const setTheme = () => {
     if (user.theme == 1) {
-      setIsDarkMode(true); 
+      setIsDarkMode(true);
     } else {
-      setIsDarkMode(false); 
+      setIsDarkMode(false);
     }
   };
 
@@ -248,7 +251,6 @@ const styles = StyleSheet.create({
   },
   completedTask: {
     textDecorationLine: "line-through",
-    color: "gray",
   },
   completedSubTask: {
     textDecorationLine: "line-through",
