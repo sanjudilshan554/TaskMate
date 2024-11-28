@@ -13,13 +13,17 @@ import Logo from "../../components/Logo";
 import Header from "../../components/Header";
 import Paragraph from "../../components/Paragraph";
 import Button from "../../components/Button";
+import SubHeader from "../../components/SubHeader";
 import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function HomeScreen() {
   const [tasks, setTasks] = useState([]);
+  const [user, setUser] = useState({});
 
   useEffect(() => {
     fetchTasks();
+    fetchUserData();
   }, []);
 
   const fetchTasks = async () => {
@@ -31,6 +35,16 @@ export default function HomeScreen() {
       console.error("Error fetching tasks:", error);
     }
   };
+
+  const fetchUserData = async () => {
+    const userData = await AsyncStorage.getItem("userData");
+    if (userData) {
+      const userDetails = JSON.parse(userData);
+      setUser(userDetails);
+      console.log('de', user);
+    }
+  };
+  
 
   const navigation = useNavigation();
 
@@ -71,6 +85,7 @@ export default function HomeScreen() {
     <ScrollView style={styles.scrollView}>
       <Background>
         <Logo />
+        <SubHeader>Hi {user.name}</SubHeader>
         <Header>Welcome to Task Mate</Header>
         <Paragraph>
           Manage your tasks efficiently. Here’s a list of your current tasks.

@@ -12,13 +12,14 @@ import { theme } from "../core/theme";
 import { emailValidator } from "../helpers/emailValidator";
 import { passwordValidator } from "../helpers/passwordValidator";
 import { nameValidator } from "../helpers/nameValidator";
+import axios from "axios";
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState({ value: "", error: "" });
   const [email, setEmail] = useState({ value: "", error: "" });
   const [password, setPassword] = useState({ value: "", error: "" });
 
-  const onSignUpPressed = () => {
+  const onSignUpPressed = async () => {
     const nameError = nameValidator(name.value);
     const emailError = emailValidator(email.value);
     const passwordError = passwordValidator(password.value);
@@ -29,15 +30,20 @@ export default function RegisterScreen({ navigation }) {
       setPassword({ ...password, error: passwordError });
       return;
     }
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "HomeScreen" }],
+
+    const response = await axios.post("http://127.0.0.1:8000/api/user/store", {
+      name: name.value,
+      email: email.value,
+      password: password.value,
     });
+
+    alert("Account registered successfully");
+    navigation.replace("HomeScreen");
   };
 
   return (
     <Background>
-      {/* <BackButton goBack={navigation.goBack} /> */}
+      <BackButton onPress={() => navigation.replace("LoginScreen")} />
       <Logo />
       <Header>Welcome.</Header>
       <TextInput
