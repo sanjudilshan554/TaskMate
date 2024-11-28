@@ -15,6 +15,7 @@ import {
   TextInput,
 } from "react-native";
 import BackButton from "../../components/BackButton";
+import BackLightButton from "../../components/BackLightButton";
 import { lightTheme, darkTheme } from "../core/theme";
 import LogoLight from "../../components/LogoLight";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -119,8 +120,19 @@ export default function TaskDetailsScreen({ route, navigation }) {
       style={[styles.scrollView, { backgroundColor: theme.background }]}
     >
       <Background style={{ backgroundColor: theme.background }}>
-        <BackButton onPress={() => navigation.replace("HomeScreen")} />
-
+        {isDarkMode ? (
+          <BackLightButton
+            onPress={() =>
+              navigation.replace("TaskDetailsScreen", { taskId: taskId })
+            }
+          />
+        ) : (
+          <BackButton
+            onPress={() =>
+              navigation.replace("TaskDetailsScreen", { taskId: taskId })
+            }
+          />
+        )}
         {isDarkMode ? <LogoLight /> : <Logo />}
         <Header
           style={{

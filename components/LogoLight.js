@@ -4,7 +4,7 @@ import { Image, StyleSheet } from "react-native";
 export default function LogoLight() {
   return (
     <Image
-      source={require("../assets/icon_light.png")}
+      source={require("../assets/items/logo_light.png")}
       style={styles.image}
     />
   );

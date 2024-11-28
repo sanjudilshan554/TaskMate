@@ -29,7 +29,7 @@ export default function HomeScreen() {
 
   const theme = isDarkMode ? darkTheme : lightTheme; // Dynamically set the theme
 
-  console.log("dark mode", theme);
+  // console.log("dark mode", theme);
 
   useEffect(() => {
     fetchUserData();
@@ -60,7 +60,7 @@ export default function HomeScreen() {
   };
 
   const setTheme = () => {
-    console.log('user',user.theme)
+    // console.log('user',user.theme)
     if (user.theme == 1) {
       setIsDarkMode(true);
       console.log('true');

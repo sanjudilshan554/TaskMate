@@ -20,6 +20,7 @@ import BackButton from "../../components/BackButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { lightTheme, darkTheme } from "../core/theme";
 import LogoLight from "../../components/LogoLight";
+import BackLightButton from "../../components/BackLightButton";
 
 export default function AddTaskScreen({ navigation }) {
   const [taskTitle, setTaskTitle] = useState("");
@@ -112,6 +113,12 @@ export default function AddTaskScreen({ navigation }) {
     >
       <Background style={{ backgroundColor: theme.background }}>
         <BackButton onPress={() => navigation.replace("HomeScreen")} />
+        {isDarkMode ? (
+          <BackLightButton onPress={() => navigation.replace("HomeScreen")} />
+        ) : (
+          <BackButton onPress={() => navigation.replace("HomeScreen")} />
+        )}
+
         {isDarkMode ? <LogoLight /> : <Logo />}
         <Header
           style={{

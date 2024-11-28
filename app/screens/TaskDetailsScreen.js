@@ -12,6 +12,7 @@ import CompleteButton from "../../components/CompleteButton";
 import { lightTheme, darkTheme } from "../core/theme";
 import LogoLight from "../../components/LogoLight";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import BackLightButton from "../../components/BackLightButton";
 
 export default function TaskDetailsScreen({ route, navigation }) {
   const { taskId } = route.params; // Get taskId from route parameters
@@ -89,7 +90,12 @@ export default function TaskDetailsScreen({ route, navigation }) {
       style={[styles.scrollView, { backgroundColor: theme.background }]}
     >
       <Background style={{ backgroundColor: theme.background }}>
-        <BackButton onPress={() => navigation.replace("HomeScreen")} />
+        {isDarkMode ? (
+          <BackLightButton onPress={() => navigation.replace("HomeScreen")} />
+        ) : (
+          <BackButton onPress={() => navigation.replace("HomeScreen")} />
+        )}
+
         {isDarkMode ? <LogoLight /> : <Logo />}
 
         <Header

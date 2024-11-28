@@ -2,31 +2,66 @@ import React, { useState, useEffect } from "react";
 import Background from "../../components/Background";
 import Logo from "../../components/Logo";
 import Header from "../../components/Header";
-import TextInput from "../../components/TextInput";
 import Button from "../../components/Button";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Alert, View, StyleSheet } from "react-native";
+import { Alert, View, StyleSheet, ScrollView, TextInput } from "react-native";
 import BackButton from "../../components/BackButton";
 import DeleteButton from "../../components/DeleteButton";
 import axios from "axios";
+import { lightTheme, darkTheme } from "../core/theme";
+import LogoLight from "../../components/LogoLight";
+import BackLightButton from "../../components/BackLightButton";
 
 export default function UserProfileScreen({ navigation }) {
-  const [user, setUser] = useState(null); // State for user details
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false); // Loading state
   const [name, setName] = useState(""); // State for username
   const [email, setEmail] = useState(""); // State for email
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const theme = isDarkMode ? darkTheme : lightTheme; // Dynamically set the theme
 
   useEffect(() => {
     fetchUserData();
+    setTheme();
   }, []);
 
   const fetchUserData = async () => {
-    const userData = await AsyncStorage.getItem("userData");
-    if (userData) {
-      const userDetails = JSON.parse(userData);
-      setUser(userDetails);
-      setName(userDetails.name || "");
-      setEmail(userDetails.email || "");
+    try {
+      const userData = await AsyncStorage.getItem("userData");
+      if (userData) {
+        const userDetails = JSON.parse(userData);
+        setUser(userDetails);
+        setName(userDetails.name || "");
+        setEmail(userDetails.email || "");
+        if (userDetails.theme === 1) {
+          setIsDarkMode(true);
+        } else {
+          setIsDarkMode(false);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      Alert.alert("Error", "Failed to load user data.");
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      setTheme();
+    }
+  }, [user]); // Re-run only when 'user' changes
+
+  const setTheme = () => {
+    if (!user) {
+      return; // Exit if user is not yet loaded
+    }
+    console.log("user", user);
+    if (user.theme == 1) {
+      setIsDarkMode(true);
+      console.log("true");
+    } else {
+      setIsDarkMode(false);
+      console.log("false");
     }
   };
 
@@ -72,60 +107,90 @@ export default function UserProfileScreen({ navigation }) {
   };
 
   return (
-    <Background>
-      <BackButton onPress={() => navigation.replace("HomeScreen")} />
-      <Logo />
-      <Header>User Profile</Header>
+    <ScrollView
+      style={[styles.scrollView, { backgroundColor: theme.background }]}
+    >
+      {" "}
+      <Background>
+        {isDarkMode ? (
+          <BackLightButton onPress={() => navigation.replace("HomeScreen")} />
+        ) : (
+          <BackButton onPress={() => navigation.replace("HomeScreen")} />
+        )}
+        {isDarkMode ? <LogoLight /> : <Logo />}
+        <Header
+          style={{
+            // color: theme.text,
+            fontSize: 21,
+            color: theme.primary,
+            fontWeight: "bold",
+            paddingVertical: 12,
+          }}
+        >
+          User Profile
+        </Header>
 
-      {user ? (
-        <>
-          <TextInput
-            label="Name"
-            placeholder="Enter your name"
-            value={name}
-            onChangeText={setName}
-          />
-          <TextInput
-            label="Email"
-            placeholder="Enter your email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-          />
+        {user ? (
+          <>
+            <TextInput
+              style={[styles.input, { color: theme.text }]}
+              label="Name"
+              placeholder="Enter your name"
+              value={name}
+              onChangeText={setName}
+            />
+            <TextInput
+              style={[styles.input, { color: theme.text }]}
+              label="Email"
+              placeholder="Enter your email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
 
-          <Button
-            mode="contained"
-            onPress={updateUserProfile}
-            loading={loading}
-          >
-            {loading ? "Updating..." : "Save Changes"}
-          </Button>
+            <Button
+              mode="contained"
+              onPress={updateUserProfile}
+              loading={loading}
+            >
+              {loading ? "Updating..." : "Save Changes"}
+            </Button>
 
-          {/* <DeleteButton mode="outlined" onPress={deleteUserAccount} style={styles.deleteButton}>
-            Delete Account
-          </DeleteButton> */}
+            {/* <DeleteButton mode="outlined" onPress={deleteUserAccount} style={styles.deleteButton}>
+          Delete Account
+        </DeleteButton> */}
 
-          <DeleteButton
-            mode="outlined"
-            onPress={async () => {
-              const userConfirmed = window.confirm(
-                "Are you sure you want to delete your account?"
-              );
-              if (userConfirmed) {
-                deleteUserAccount();
-              } else {
-                alert("Task deletion canceled.");
-              }
-            }}
-          >
-            Delete Task
-          </DeleteButton>
-        </>
-      ) : (
-        <Header>Loading user data...</Header>
-      )}
-    </Background>
+            <DeleteButton
+              mode="outlined"
+              onPress={async () => {
+                const userConfirmed = window.confirm(
+                  "Are you sure you want to delete your account?"
+                );
+                if (userConfirmed) {
+                  deleteUserAccount();
+                } else {
+                  alert("Task deletion canceled.");
+                }
+              }}
+            >
+              Delete Task
+            </DeleteButton>
+          </>
+        ) : (
+          <Header>Loading user data...</Header>
+        )}
+      </Background>
+    </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    width: "100%",
+  },
+});
