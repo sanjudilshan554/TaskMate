@@ -57,12 +57,10 @@ export default function AddTaskScreen({ navigation }) {
   };
 
   const setTheme = () => {
-    console.log("user", user);
     if (user.theme == 1) {
       setIsDarkMode(true);
     } else {
       setIsDarkMode(false);
-      console.log("theme", false);
     }
   };
 
@@ -97,7 +95,7 @@ export default function AddTaskScreen({ navigation }) {
       setDate(new Date());
       alert("Task added successfully");
     } catch (error) {
-      console.error("Error adding task:", error);
+      alert("Error adding task"); 
     } finally {
       setLoading(false);
     }

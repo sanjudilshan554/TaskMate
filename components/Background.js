@@ -8,7 +8,6 @@ import {
 import { theme } from "../app/core/theme";
 
 export default function Background({ children, theme }) {
-  console.log("theme", theme);
   return (
     <ImageBackground
       source={require("../assets/items/dot.png")}

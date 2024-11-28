@@ -39,9 +39,8 @@ export default function UserProfileScreen({ navigation }) {
           setIsDarkMode(false);
         }
       }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      Alert.alert("Error", "Failed to load user data.");
+    } catch (error) { 
+      alert("Failed to load user data.");
     }
   };
 
@@ -54,14 +53,11 @@ export default function UserProfileScreen({ navigation }) {
   const setTheme = () => {
     if (!user) {
       return; // Exit if user is not yet loaded
-    }
-    console.log("user", user);
+    } 
     if (user.theme == 1) {
-      setIsDarkMode(true);
-      console.log("true");
+      setIsDarkMode(true); 
     } else {
-      setIsDarkMode(false);
-      console.log("false");
+      setIsDarkMode(false); 
     }
   };
 
@@ -86,9 +82,8 @@ export default function UserProfileScreen({ navigation }) {
         JSON.stringify(response.data.data)
       ); // Update local storage
       fetchUserData(); // Refresh local data
-    } catch (error) {
-      console.error("Error updating user:", error);
-      Alert.alert("Error", "Failed to update profile.");
+    } catch (error) { 
+       alert("Failed to update profile.");
     } finally {
       setLoading(false);
     }
@@ -100,8 +95,7 @@ export default function UserProfileScreen({ navigation }) {
       alert("Your account has been deleted.");
       await AsyncStorage.clear(); // Clear stored data
       navigation.replace("LoginScreen");
-    } catch (error) {
-      console.error("Error deleting user:", error);
+    } catch (error) { 
       alert("Failed to delete account.");
     }
   };

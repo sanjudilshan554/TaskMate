@@ -54,13 +54,11 @@ export default function TaskDetailsScreen({ route, navigation }) {
     }
   };
 
-  const setTheme = () => {
-    console.log("user", user);
+  const setTheme = () => { 
     if (user.theme == 1) {
       setIsDarkMode(true);
     } else {
-      setIsDarkMode(false);
-      console.log("theme", false);
+      setIsDarkMode(false); 
     }
   };
 
@@ -75,7 +73,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
       setTaskDate(response.data.selected_date_time);
       setTaskStatus(response.data.status); // Set the initial status from the API response
     } catch (error) {
-      console.error("Error fetching task:", error);
+      alert("Error fetching task") 
     } finally {
       setLoading(false); // Loading is complete
     }
@@ -109,7 +107,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
       alert("Task updated successfully");
       navigation.navigate("TaskDetailsScreen", { taskId: taskId });
     } catch (error) {
-      console.error("Error updating task:", error);
+      alert("Error updating task"); 
     } finally {
       setLoading(false);
     }
@@ -221,8 +219,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
                     );
                     alert("Task deleted successfully!");
                     navigation.replace("HomeScreen"); // Navigate back to the previous screen
-                  } catch (error) {
-                    console.error("Error deleting task:", error);
+                  } catch (error) { 
                     alert("Failed to delete the task. Please try again.");
                   }
                 } else {

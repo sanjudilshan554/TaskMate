@@ -44,13 +44,11 @@ export default function TaskDetailsScreen({ route, navigation }) {
     }
   };
 
-  const setTheme = () => {
-    console.log("user", user);
+  const setTheme = () => { 
     if (user.theme == 1) {
       setIsDarkMode(true);
     } else {
-      setIsDarkMode(false);
-      console.log("theme", false);
+      setIsDarkMode(false); 
     }
   };
 
@@ -61,7 +59,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
       );
       setTask(response.data);
     } catch (error) {
-      console.error("Error fetching task:", error);
+      alert("Error fetching task"); 
     } finally {
       setLoading(false); // Loading is complete
     }
@@ -76,8 +74,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
         await axios.get(`http://127.0.0.1:8000/api/task/complete/${taskId}`);
         alert("Task Completed Successfully");
         setTask((prevTask) => ({ ...prevTask, status: 1 })); // Directly update task status
-      } catch (error) {
-        console.error("Error completing task:", error);
+      } catch (error) { 
         alert("Failed to save completed task. Please try again.");
       }
     } else {
@@ -170,8 +167,7 @@ export default function TaskDetailsScreen({ route, navigation }) {
                     );
                     alert("Task deleted successfully!");
                     navigation.replace("HomeScreen"); // Navigate back to the previous screen
-                  } catch (error) {
-                    console.error("Error deleting task:", error);
+                  } catch (error) { 
                     alert("Failed to delete the task. Please try again.");
                   }
                 } else {

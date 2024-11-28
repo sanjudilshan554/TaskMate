@@ -29,8 +29,6 @@ export default function HomeScreen() {
 
   const theme = isDarkMode ? darkTheme : lightTheme; // Dynamically set the theme
 
-  // console.log("dark mode", theme);
-
   useEffect(() => {
     fetchUserData();
   }, []);
@@ -44,29 +42,24 @@ export default function HomeScreen() {
 
   // Function to save theme preference to the database
   const saveTheme = async (newTheme) => {
-    try {
-      console.log("isDarkMode", newTheme);
+    try { 
       const response = await axios.post(
         `http://127.0.0.1:8000/api/user/theme/update/${user.id}`, // Ensure the endpoint is correct
         {
           theme: newTheme ? 1 : 0, // 1 for dark mode, 0 for light mode
         }
       );
-      await AsyncStorage.setItem("userData", JSON.stringify(response.data.data));
-      console.log("Theme saved successfully:", response.data);
+      await AsyncStorage.setItem("userData", JSON.stringify(response.data.data)); 
     } catch (error) {
-      console.error("Error saving theme:", error);
+      alert("Error saving theme");
     }
   };
 
-  const setTheme = () => {
-    // console.log('user',user.theme)
+  const setTheme = () => { 
     if (user.theme == 1) {
-      setIsDarkMode(true);
-      console.log('true');
+      setIsDarkMode(true); 
     } else {
-      setIsDarkMode(false);
-      console.log('false');
+      setIsDarkMode(false); 
     }
   };
 
@@ -84,7 +77,7 @@ export default function HomeScreen() {
       );
       setTasks(response.data);
     } catch (error) {
-      console.error("Error fetching tasks:", error);
+      alert("Error fetching tasks");
     }
   };
 
@@ -96,7 +89,7 @@ export default function HomeScreen() {
         setUser(userDetails); // This will trigger the second useEffect
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      alert("Error fetching user data");
     }
   };
 
